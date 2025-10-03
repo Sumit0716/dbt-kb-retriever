@@ -24,7 +24,7 @@ model = None
 def load_model():
     print("📂 Loading model from Hugging Face Hub...")
     # 👇 Replace <your-username>/<your-model-repo> with your Hugging Face repo
-    model = SentenceTransformer("Sumit070809/dbt-kb-model")
+    model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
     print("✅ Model loaded successfully from Hugging Face Hub")
     return model
 
@@ -90,3 +90,4 @@ def rebuild():
     """Rebuild FAISS index from latest dbt_kb.json without restart."""
     build_index()
     return {"status": "reloaded", "kb_chunks": len(kb)}
+
