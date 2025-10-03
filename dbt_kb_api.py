@@ -1,11 +1,10 @@
 import os, certifi, json, faiss, numpy as np
 from pathlib import Path
 from fastapi import FastAPI, Query
-from sentence_transformers import SentenceTransformer, models
-from transformers import AutoModel, AutoTokenizer
+from sentence_transformers import SentenceTransformer
 
 # ----------------------------
-# SSL FIX (works without admin rights)
+# SSL FIX (works without admin rights, avoids cert issues)
 # ----------------------------
 os.environ["REQUESTS_CA_BUNDLE"] = certifi.where()
 os.environ["SSL_CERT_FILE"] = certifi.where()
@@ -14,26 +13,20 @@ os.environ["SSL_CERT_FILE"] = certifi.where()
 # Globals for KB + FAISS
 # ----------------------------
 KB_PATH = Path("dbt_kb.json")
-MODEL_DIR = Path("./models/all-MiniLM-L6-v2")
 
 kb = []
 index = None
 model = None
 
 # ----------------------------
-# Model Loader
+# Model Loader (from Hugging Face Hub)
 # ----------------------------
 def load_model():
-    if not MODEL_DIR.exists():
-        raise FileNotFoundError("❌ Model directory not found. Please download model files into ./models/all-MiniLM-L6-v2")
-    try:
-        print(f"📂 Trying to load SentenceTransformer from {MODEL_DIR}")
-        return SentenceTransformer(str(MODEL_DIR))
-    except Exception as e:
-        print(f"⚠️ Could not load as SentenceTransformer ({e}). Falling back to AutoModel + Pooling...")
-        word_embedding_model = models.Transformer(str(MODEL_DIR))
-        pooling_model = models.Pooling(word_embedding_model.get_word_embedding_dimension())
-        return SentenceTransformer(modules=[word_embedding_model, pooling_model])
+    print("📂 Loading model from Hugging Face Hub...")
+    # 👇 Replace <your-username>/<your-model-repo> with your Hugging Face repo
+    model = SentenceTransformer("Sumit070809/dbt-kb-model")
+    print("✅ Model loaded successfully from Hugging Face Hub")
+    return model
 
 # ----------------------------
 # KB + FAISS Builder
